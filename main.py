@@ -111,21 +111,20 @@ if __name__ == '__main__':
     bogof = BOGOF()
     ten_percent = Discount(discount_percent=10, quantity_required=3)
 
-    products = [
-        Product(name="Fruit tea", code="FR1", price=311, offer=bogof),
-        Product(name="Fruit tea", code="FR1", price=311, offer=bogof),
-        Product(name="Fruit tea", code="FR1", price=311, offer=bogof),
-        Product(name="Fruit tea", code="FR1", price=311, offer=bogof),
-        Product(name="Fruit tea", code="FR1", price=311, offer=bogof),
-        Product(name="Coffee", code="CF1", price=1123),
-        Product(name="Strawberries", code="SR1", price=500, offer=ten_percent),
-        Product(name="Strawberries", code="SR1", price=500, offer=ten_percent),
-        Product(name="Strawberries", code="SR1", price=500, offer=ten_percent),
-        Product(name="Strawberries", code="SR1", price=500, offer=ten_percent),
-        Product(name="Strawberries", code="SR1", price=500, offer=ten_percent),
-    ]
+    tea = Product(name="Fruit tea", code="FR1", price=311, offer=bogof)
+    strawberries = Product(name="Strawberries", code="SR1", price=500, offer=ten_percent)
+    coffee = Product(name="Coffee", code="CF1", price=1123)
 
-    for prod in products:
-        checkout.scan(prod)
+    checkout.scan(tea)
+    checkout.scan(tea)
+    checkout.scan(strawberries)
+    checkout.scan(strawberries)
+    checkout.scan(strawberries)
+    checkout.scan(coffee)
 
+    # total should be:
+    # - £3.11 for tea, one item is free (worth £3.11)
+    # - £13.50 for strawberries, includes £1.50 discount
+    # - £11.23 for coffee, no discount
+    # - Total: £27.84
     checkout.print_totals()
