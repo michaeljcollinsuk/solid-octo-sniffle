@@ -56,37 +56,33 @@ class Product:
 class Checkout:
 
     def __init__(self):
-        self.products = []
+        self.products = defaultdict(list)
         self.sub_total = 0
 
     @property
     def quantities(self):
-        quantities = defaultdict(int)
-        for product in self.products:
-            quantities[product.code] += 1
-        return quantities
+        return {code: len(products) for code, products in self.products.items()}
+
+    @property
+    def distinct_products(self):
+        return [products[0] for products in self.products.values()]
 
     def scan(self, product):
-        self.products.append(product)
+        self.products[product.code].append(product)
         self.sub_total += product.price
 
     def calculate_discounts(self):
-        applied = []
         reductions = 0
-        for product in self.products:
+        for product in self.distinct_products:
             
             offer = product.offer
             if not offer:
-                continue
-
-            if product.code in applied:
                 continue
 
             reduction = offer.get_reduction(
                 item_price=product.price,
                 quantity=self.quantities[product.code]
             )
-            applied.append(product.code)
             reductions += reduction
 
         return reductions
@@ -104,6 +100,15 @@ class Checkout:
         total = self.pretty_price(self.total)
         print(f"{sub_total=}")
         print(f"{total=}")
+
+
+checkout = Checkout()
+bogof = BOGOF()
+ten_percent = Discount(discount_percent=10, quantity_required=3)
+
+tea = Product(name="Fruit tea", code="FR1", price=311, offer=bogof)
+strawberries = Product(name="Strawberries", code="SR1", price=500, offer=ten_percent)
+coffee = Product(name="Coffee", code="CF1", price=1123)
 
 
 if __name__ == '__main__':
