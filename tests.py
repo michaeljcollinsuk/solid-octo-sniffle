@@ -1,13 +1,13 @@
 import unittest
 
-from main import BOGOF, Discount, Product, Checkout
+from main import Discount, Product, Checkout
 
 
 class TestTotals(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.bogof = BOGOF()
-        self.ten_percent_discount = Discount(discount_percent=10, quantity_required=3)
+        self.bogof = Discount(discount_percent=100, quantity_required=2, applies_to=2)
+        self.ten_percent_discount = Discount(discount_percent=10, quantity_required=3, applies_to=1)
         self.checkout = Checkout()
 
     def test_fruit_tea_buy_one_get_one_free(self):
