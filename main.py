@@ -2,7 +2,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 
 
-class OfferMixin:
+class Offer:
 
     quantity_required = None
 
@@ -10,7 +10,7 @@ class OfferMixin:
         raise NotImplementedError("Subclass must implement this method")
 
 
-class BOGOF(OfferMixin):
+class BOGOF(Offer):
 
     quantity_required = 2
 
@@ -22,7 +22,7 @@ class BOGOF(OfferMixin):
         return item_price * items_free
 
 
-class Discount(OfferMixin):
+class Discount(Offer):
 
     def __init__(self, quantity_required, discount_percent):
         super().__init__()
@@ -30,7 +30,7 @@ class Discount(OfferMixin):
         self.discount_percent = discount_percent
 
     @property
-    def discount_percentage(self):
+    def discount_decimal(self):
         if not self.discount_percent:
             return 0
         return self.discount_percent / 100
@@ -39,7 +39,7 @@ class Discount(OfferMixin):
         if quantity < self.quantity_required:
             return 0
 
-        discount_per_item = int(item_price * self.discount_percentage)
+        discount_per_item = int(item_price * self.discount_decimal)
         total_discount = quantity * discount_per_item
         return total_discount
 
@@ -50,12 +50,14 @@ class Product:
     name: str
     code: str
     price: int
-    offer: OfferMixin = None
+    offer: Offer = None
 
 
 class Checkout:
 
     def __init__(self):
+        # this would have been better as a defaultdict, allow lookup product
+        # by their code
         self.products = []
         self.sub_total = 0
 
@@ -66,6 +68,10 @@ class Checkout:
             quantities[product.code] += 1
         return quantities
 
+    @property
+    def total(self):
+        return self.sub_total - self.calculate_discounts()
+
     def scan(self, product):
         self.products.append(product)
         self.sub_total += product.price
@@ -73,6 +79,10 @@ class Checkout:
     def calculate_discounts(self):
         applied = []
         reductions = 0
+
+        # this is inefficient as it goes through duplciate products and checks
+        # if they are already applied or not. Would be better to go through
+        # distinct products
         for product in self.products:
             
             offer = product.offer
@@ -90,10 +100,6 @@ class Checkout:
             reductions += reduction
 
         return reductions
-
-    @property
-    def total(self):
-        return self.sub_total - self.calculate_discounts()
 
     def pretty_price(self, price):
         decimal = price / 100
