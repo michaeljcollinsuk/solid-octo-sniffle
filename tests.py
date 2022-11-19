@@ -15,7 +15,9 @@ class TestTotals(unittest.TestCase):
         Check that when two fruit tea products are scanned, the total is the price of one as the BOGOF offer is applied.
         If a third is added to the basked, the price is increased, but the fourth item is also free
         """
-        fruit_tea = Product(name="Fruit tea", code="FR1", price=311, offer=self.bogof)
+        fruit_tea = Product(name="Fruit tea", code="FR1", price=311)
+
+        fruit_tea.change_offer(self.bogof)
 
         self.checkout.scan(fruit_tea)
         self.assertEqual(self.checkout.total, 311)

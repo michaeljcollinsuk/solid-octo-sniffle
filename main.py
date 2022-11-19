@@ -34,6 +34,12 @@ class Product:
     price: int
     offer: Discount = None
 
+    def change_offer(self, offer):
+        """
+        Method to explicitly change an offer related to a procuct
+        """
+        self.offer = offer
+
 
 class Checkout:
 
